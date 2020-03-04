@@ -1,0 +1,79 @@
+--1
+SELECT nume,prenume,salariu
+FROM fst_angajati
+WHERE salariu BETWEEN 6000 AND 10000;
+
+--2
+SELECT nume,prenume,to_char(data_nasterii,'dd-mm-yy')
+FROM fst_angajati
+WHERE to_char(data_nasterii,'yy') IN (69,70,94,97);
+
+--3
+SELECT nume,prenume,id_localitate
+FROM fst_angajati 
+JOIN fst_asistenti 
+USING (id_angajat)
+WHERE id_asistent > 900
+GROUP BY nume,prenume,id_localitate;
+
+--4
+SELECT nvl(S.nume,0) spital,L.nume localitate ,T.nume tara
+FROM fst_spitale S
+RIGHT JOIN fst_localitate L
+USING (id_localitate)
+RIGHT JOIN fst_tara T
+ON L.id_tara = T.id_tara
+GROUP BY S.nume,L.nume,T.nume
+ORDER BY S.nume;
+
+--5
+SELECT round(AVG(salariu),2),COUNT(nume)
+FROM fst_angajati 
+JOIN fst_doctori
+USING (id_angajat);
+
+--6
+SELECT nume,prenume,COUNT(id_doctor) numar_pacienti
+FROM fst_angajati
+JOIN fst_doctori
+USING (id_angajat)
+JOIN fst_repartizare_pacienti
+USING (id_doctor)
+GROUP BY nume,prenume
+HAVING COUNT(id_doctor)> 1;
+
+--7
+SELECT S.nume,COUNT(id_specialitate)
+FROM fst_specialitati_doctori
+JOIN fst_specialitati S
+USING(id_specialitate)
+GROUP BY S.nume,id_specialitate
+HAVING COUNT(id_specialitate)>1
+ORDER BY COUNT(id_specialitate) DESC;
+
+--8
+SELECT UPPER(nume), LENGTH(nume)
+FROM fst_angajati
+JOIN fst_doctori
+USING (id_angajat)
+WHERE substr(LOWER(TRIM(nume)),1,1)='a'
+OR substr(LOWER(TRIM(nume)),1,1)='s'
+OR substr(LOWER(TRIM(nume)),3,1)='a';
+
+--9
+SELECT nume,prenume,round((sysdate-data_nasterii)/365) varsta
+FROM fst_angajati
+ORDER BY varsta DESC;
+
+--10
+SELECT nume, prenume, cnp,
+CASE
+    WHEN id_localitate = 599 THEN 'CASMB'
+    ELSE 'ALTCEVA' 
+    END asigurare
+FROM fst_pacienti;
+
+--11
+SELECT SUM(nr_paturi),id_salon
+FROM fst_saloane
+GROUP BY nr_paturi,id_salon;
